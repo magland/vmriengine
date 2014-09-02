@@ -1,0 +1,176 @@
+#include "vmriengine.h"
+#include <QList>
+#include "vmriinterface.h"
+#include <stdio.h>
+#include <QDebug>
+
+#define COMMAND_TYPE_addRFOperator 1
+#define COMMAND_TYPE_initialize 2
+#define COMMAND_TYPE_evolve 3
+#define COMMAND_TYPE_excite 4
+#define COMMAND_TYPE_readout 5
+
+class VmriEnginePrivate {
+public:
+	AbstractPhantom *m_phantom;
+	AbstractSimSequence *m_sim_sequence;
+	QString m_output_file;
+	
+	VmriInterface m_interface;
+	
+	void load_isochromats();
+	QList<SimCommand> load_sim_commands();
+};
+
+VmriEngine::VmriEngine() {
+	d=new VmriEnginePrivate;
+	d->m_phantom=0;
+	d->m_sim_sequence=0;
+}
+
+VmriEngine::~VmriEngine() {
+	delete d;
+}
+
+void VmriEngine::setPhantom(AbstractPhantom *phantom) {
+	d->m_phantom=phantom;
+}
+void VmriEngine::setSimSequence(AbstractSimSequence *sim_sequence) {
+	d->m_sim_sequence=sim_sequence;
+}
+void VmriEngine::setOutputFile(const QString &fname) {
+	d->m_output_file=fname;
+}
+
+void VmriEnginePrivate::load_isochromats() {
+	if (!m_phantom) return;
+	
+	qDebug() << __LINE__;
+	
+	qint32 N=m_phantom->isochromatCount();
+	double *x,*y,*z,*f,*d,*T1,*T2;
+	x=(double *)malloc(sizeof(double)*N);
+	y=(double *)malloc(sizeof(double)*N);
+	z=(double *)malloc(sizeof(double)*N);
+	f=(double *)malloc(sizeof(double)*N);
+	d=(double *)malloc(sizeof(double)*N);
+	T1=(double *)malloc(sizeof(double)*N);
+	T2=(double *)malloc(sizeof(double)*N);
+	
+	for (long i=0; i<N; i++) {
+		Isochromat II=m_phantom->getIsochromat(i);
+		
+		x[i]=II.x;
+		y[i]=II.y;
+		z[i]=II.z;
+		f[i]=II.f;
+		d[i]=II.d;
+		T1[i]=II.T1;
+		T2[i]=II.T2;
+	}
+	
+	m_interface.setIsochromats(N,x,y,z,f,d,T1,T2);
+	
+	free(x);
+	free(y);
+	free(z);
+	free(f);
+	free(d);
+	free(T1);
+	free(T2);
+}
+
+
+
+QList<SimCommand> VmriEnginePrivate::load_sim_commands() {
+    qDebug() << __LINE__;
+
+	QList<SimCommand> ret;
+	
+	if (!m_sim_sequence) return ret;
+
+    qDebug() << __LINE__;	
+	while (!m_sim_sequence->atEnd()) {
+    	qDebug() << __LINE__;  
+		ret << m_sim_sequence->nextSimCommand();
+	}
+	qDebug() << __LINE__;
+	
+	return ret;
+}
+
+void VmriEngine::execute() {
+	
+	d->load_isochromats();
+	QList<SimCommand> CClist=d->load_sim_commands();
+	
+	FILE *outf=fopen(d->m_output_file.toAscii().data(),"wb");
+	
+	qDebug() << __LINE__;
+	for (int i=0; i<CClist.count(); i++) {
+		SimCommand CC=CClist[i];
+		qDebug() << __LINE__ << CC.command_type;
+		if (CC.command_type=="addRFOperator") {
+			d->m_interface.addRFOperator(CC.freq_min,CC.freq_step,CC.num_freqs,CC.operators);
+		}
+		else if (CC.command_type=="initialize") {
+			d->m_interface.initialize();
+		}
+		else if (CC.command_type=="evolve") {
+			d->m_interface.evolve(CC.A,CC.t);
+		}
+		else if (CC.command_type=="excite") {
+			d->m_interface.excite(CC.RF_index,CC.A,CC.phase,CC.frequency);
+		}
+		else if (CC.command_type=="readout") {
+		    //qDebug() << __LINE__ << CC.num_readout_points;
+		    
+		    printf("test %d\n",__LINE__);
+		    
+			double *ret_real=(double *)malloc(sizeof(float)*CC.num_readout_points);
+			double *ret_imag=(double *)malloc(sizeof(float)*CC.num_readout_points);
+			
+			printf("test %d\n",__LINE__);
+			
+			//qDebug() << __LINE__;
+			d->m_interface.readout(ret_real,ret_imag,CC.num_readout_points,CC.A,CC.dwell_time,CC.frequency);
+			
+			printf("test %d\n",__LINE__);
+			
+			//qDebug() << __LINE__;
+			quint32 N=CC.num_readout_points;
+			quint32 readout_index0=CC.readout_index;
+			float dwell_time=CC.dwell_time;
+			
+			printf("test %d\n",__LINE__);
+			
+			//qDebug() << __LINE__;
+			fwrite(&N,sizeof(quint32),1,outf);
+			fwrite(&readout_index0,sizeof(quint32),1,outf);
+			fwrite(&dwell_time,sizeof(float),1,outf);
+			for (unsigned int i=0; i<29*4; i++) {
+				unsigned char c=0;
+				fwrite(&c,1,1,outf);
+			}
+			printf("test %d\n",__LINE__);
+			
+			//qDebug() << __LINE__;
+			for (unsigned int i=0; i<N; i++) {
+				float re,im;
+				re=ret_real[i];
+				im=ret_imag[i];
+	
+				fwrite(&re,sizeof(float),1,outf);
+				fwrite(&im,sizeof(float),1,outf);
+			}
+			
+			printf("test %d\n",__LINE__);
+			
+			//qDebug() << __LINE__;
+			free(ret_real);
+			free(ret_imag);
+		}
+	}
+	
+	fclose(outf);
+}
