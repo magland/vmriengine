@@ -257,10 +257,6 @@ void VmriEngine::run() {
 				double dtheta=freq0*dt/(1000*1000)*2*PI;
 				Matrix44 MM=d->compute_RF_operator(N,dt,data_real,data_imag,dtheta);
 				operators << MM;
-				if (ii==(N*oversamp/2)) {
-					printf("OPERATOR\n");
-					display_Matrix44(MM);
-				}
 			}
 			
 			d->m_interface.addRFOperator(min_freq,freq_step,num_freqs,operators);
