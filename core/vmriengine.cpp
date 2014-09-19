@@ -281,7 +281,7 @@ void VmriEngine::run() {
 			}
 			else if (block_type=="readout") {
 				int num_readout_points=CC.data.value("N",1).toInt();
-				qDebug() << "READOUT" << QString("thread=%1").arg(d->m_thread_id) << QString("readout=%1").arg(d->m_readout_number++) << QString("N=%1").arg(num_readout_points);
+				//qDebug()  << "READOUT" << QString("thread=%1").arg(d->m_thread_id) << QString("readout=%1").arg(d->m_readout_number++) << QString("N=%1").arg(num_readout_points);
 				QList<double> A=to_double_list(CC.data.value("gradient_amplitude").toList());
 				double dwell_time=CC.data.value("dt",10).toDouble();
 				double phase=CC.data.value("phase",0).toDouble();

@@ -144,7 +144,6 @@ int main(int argc,char *argv[]) {
 	QString combine_prefix=params.value("combine","");
 	if (!combine_prefix.isEmpty()) {
 		QStringList paths=get_combine_paths(combine_prefix);
-		qDebug() << paths;
 		QList<VmriReadoutList> readout_lists;
 		for (int i=0; i<paths.count(); i++) {
 			qDebug()  << QString("Loading %1").arg(paths[i]);

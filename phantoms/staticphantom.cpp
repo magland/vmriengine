@@ -105,5 +105,5 @@ void StaticPhantomPrivate::compute_volume() {
 		}
 	}
 	m_volume=num_hits*1.0/num_trials*(xmax-xmin)*(ymax-ymin)*(zmax-zmin);
-	qDebug() << "VOLUME" << m_volume;
+	qDebug()  << "VOLUME OF PHANTOM" << m_volume;
 }
