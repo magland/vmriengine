@@ -42,7 +42,7 @@ void StaticPhantom::initialize() {
 }
 
 void make_rand(double &x,double xmin,double xmax) {
-	double ret=(rand()%100000)*1.0/100000;
+	double ret=(qrand()%100000)*1.0/100000;
 	x=ret*(xmax-xmin)+xmin;
 }
 

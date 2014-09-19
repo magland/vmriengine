@@ -126,7 +126,7 @@ QList<VmriReadout> load_readouts_from_file(const QString &fname) {
 
 int main(int argc,char *argv[]) {
 	
-	qsrand(QDateTime::currentDateTime().toTime_t());
+	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
 	
 	QStringList args;
 	for (int i=1; i<argc; i++) args << QString(argv[i]);

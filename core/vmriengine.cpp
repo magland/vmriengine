@@ -5,6 +5,7 @@
 #include <math.h>
 #include <QDebug>
 #include "qjson.h"
+#include <QDateTime>
 
 #define COMMAND_TYPE_addRFOperator 1
 #define COMMAND_TYPE_initialize 2
@@ -224,6 +225,8 @@ void display_Matrix44(const Matrix44 &M) {
 
 
 void VmriEngine::run() {
+	
+	qsrand(QDateTime::currentDateTime().toMSecsSinceEpoch());
 	
 	d->load_isochromats();
 	QList<SimCommand> CClist=d->load_sim_commands();
