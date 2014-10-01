@@ -8,20 +8,20 @@ INCLUDEPATH += .
 DEPENDPATH += .
 SOURCES += vmrimain.cpp
 
-INCLUDEPATH += core
-DEPENDPATH += core
-HEADERS += vmriengine.h abstractsimsequence.h abstractphantom.h vmriinterface.h
-SOURCES += vmriengine.cpp abstractsimsequence.cpp abstractphantom.cpp vmriinterface.cpp
-HEADERS += textfile.h qjson.h parser.h qjson_export.h serializer.h qwait.h
-SOURCES += textfile.cpp qjson.cpp qwait.cpp
+INCLUDEPATH += ./core
+DEPENDPATH += ./core
+HEADERS += core/vmriengine.h core/abstractsimsequence.h core/abstractphantom.h core/vmriinterface.h
+SOURCES += core/vmriengine.cpp core/abstractsimsequence.cpp core/abstractphantom.cpp core/vmriinterface.cpp
+HEADERS += core/textfile.h core/qjson.h core/parser.h core/qjson_export.h core/serializer.h core/qwait.h
+SOURCES += core/textfile.cpp core/qjson.cpp core/qwait.cpp
 LIBS += -lqjson
 
-INCLUDEPATH += phantoms
-DEPENDPATH += phantoms
-HEADERS += staticphantom.h phantom1.h
-SOURCES += staticphantom.cpp phantom1.cpp
+INCLUDEPATH += ./phantoms
+DEPENDPATH += ./phantoms
+HEADERS += phantoms/staticphantom.h phantoms/phantom1.h
+SOURCES += phantoms/staticphantom.cpp phantoms/phantom1.cpp
 
-INCLUDEPATH += sequences
-DEPENDPATH += sequences
-HEADERS += sequence1.h
-SOURCES += sequence1.cpp
+INCLUDEPATH += ./sequences
+DEPENDPATH += ./sequences
+HEADERS += sequences/sequence1.h
+SOURCES += sequences/sequence1.cpp

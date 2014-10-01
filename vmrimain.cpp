@@ -59,7 +59,7 @@ QList<VmriReadout> combine_readout_lists(const QList<VmriReadoutList> &X) {
 }
 
 void write_readouts_to_file(const QString &fname,const QList<VmriReadout> &readouts) {
-	FILE *outf=fopen(fname.toAscii().data(),"wb");
+	FILE *outf=fopen(fname.toLatin1().data(),"wb");
 	for (int i=0; i<readouts.count(); i++) {
 		VmriReadout RO=readouts[i];
 		fwrite(&RO.N,sizeof(quint32),1,outf);
@@ -83,7 +83,7 @@ void write_readouts_to_file(const QString &fname,const QList<VmriReadout> &reado
 
 QList<VmriReadout> load_readouts_from_file(const QString &fname) {
 	QList<VmriReadout> readouts;
-	FILE *inf=fopen(fname.toAscii().data(),"rb");
+	FILE *inf=fopen(fname.toLatin1().data(),"rb");
 	
 	bool done=false;
 	while (!done) {

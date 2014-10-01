@@ -45,7 +45,7 @@ QVariant convert_variantlists_to_stringlists(const QVariant &X) {
 QVariant parseJSON(const QString &txt) {
 	QJson::Parser parser;
 	bool ok;
-	QVariant result=parser.parse(txt.toAscii(),&ok);
+	QVariant result=parser.parse(txt.toLatin1(),&ok);
 	return convert_variantlists_to_stringlists(result);
 	/*if (ok) return result.toMap();
 	else return QMap<QString,QVariant>();*/
